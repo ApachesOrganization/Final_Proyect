@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigaciones Académicas</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <div class="background"></div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="#">Investigación Académica</a>
+            <ul class="navbar-nav" id="navLinks">
+                <li><a id="navInicio" href="index.html">Inicio</a></li>
+                <li><a id="navAgregar" href="addResearch.html">Agregar Investigación</a></li>
+                <li><a id="navLogin" href="login.html">Iniciar Sesión</a></li>
+                <li><a id="navRegister" href="register.html">Registrarse</a></li>
+                <li><a id="navLogout" href="#" onclick="salir()" style="display: none;">Cerrar Sesión</a></li>
+                <li style="display: none;" id="userInfo">
+                    <div class="user-info">
+                        <img id="userPhoto" src="default_profile.png" alt="Foto de usuario" class="rounded-circle">
+                        <span id="userName" class="user-name">Usuario</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="title">Lista de Investigaciones</h1>
+
+        <div class="filters">
+            <input type="text" id="filterTopic" placeholder="Filtrar por área">
+            <input type="text" id="filterDegree" placeholder="Filtrar por grado académico">
+            <button class="btn-primary" onclick="loadResearchList()">Aplicar Filtros</button>
+            <button class="btn-secondary" onclick="clearFilters()">Quitar Filtros</button>
+        </div>
+
+        <div id="researchList" class="research-list">
+        </div>
+    </div>
+
+    <script src="/__/firebase/11.0.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="js/listResearch.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/authState.js"></script>
+    <script>
+        firebase.auth().onAuthStateChanged(user => {
+            const navLogin = document.getElementById("navLogin");
+            const navRegister = document.getElementById("navRegister");
+            const navLogout = document.getElementById("navLogout");
+            const userInfo = document.getElementById("userInfo");
+            const userNameElement = document.getElementById("userName");
+            const userPhotoElement = document.getElementById("userPhoto");
+
+            if (user) {
+                navLogin.style.display = "none";
+                navRegister.style.display = "none";
+                navLogout.style.display = "block";
+                userInfo.style.display = "flex";
+
+                const uid = user.uid;
+                firebase.firestore().collection("users").doc(uid).get()
+                    .then(doc => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            const fullName = userData.fullName || user.displayName || "Usuario";
+                            const photoURL = userData.photoURL || user.photoURL || "default_profile.png";
+
+                            userNameElement.innerText = fullName;
+                            userPhotoElement.src = photoURL;
+                        } else {
+                            userNameElement.innerText = user.displayName || "Usuario";
+                            userPhotoElement.src = user.photoURL || "default_profile.png";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al obtener datos del usuario:", error);
+                        userNameElement.innerText = user.displayName || "Usuario";
+                        userPhotoElement.src = user.photoURL || "default_profile.png";
+                    });
+            } else {
+                navLogin.style.display = "block";
+                navRegister.style.display = "block";
+                navLogout.style.display = "none";
+                userInfo.style.display = "none";
+
+                userNameElement.innerText = "Usuario";
+                userPhotoElement.src = "default_profile.png";
+            }
+        });
+    </script>
+</body>
+</html>

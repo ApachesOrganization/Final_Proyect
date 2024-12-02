@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Reglas para la colección 'users'
+    match /users/{userId} {
+      allow read: if true; // Permitir lectura pública
+      allow write: if request.auth != null && request.auth.uid == userId; // Escritura solo por el propietario
+    }
+
+    // Reglas para la colección 'researchWorks'
+    match /researchWorks/{researchId} {
+      allow read: if true; // Lectura pública
+      allow create: if request.auth != null; // Creación solo para usuarios autenticados
+      allow update: if request.auth != null && request.auth.uid == resource.data.createdBy; // Actualizar solo por el creador
+      allow delete: if request.auth != null && request.auth.uid == resource.data.createdBy; // Eliminar solo por el creador
+
+      // Reglas para la subcolección 'comments'
+      match /comments/{commentId} {
+        allow read: if true; // Lectura pública de comentarios
+        allow create: if request.auth != null; // Creación solo para usuarios autenticados
+
+        // Reglas para la subcolección 'replies' dentro de comentarios
+        match /replies/{replyId} {
+          allow read: if true; // Lectura pública de respuestas
+          allow create: if request.auth != null; // Creación solo para usuarios autenticados
+          allow delete: if request.auth != null && request.auth.uid == resource.data.createdBy; // Eliminar solo por el autor de la respuesta
+        }
+      }
+    }
+
+    // Reglas adicionales para bloquear colecciones no especificadas
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

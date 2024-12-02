@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/register.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="background"></div>
+
+    <div class="register-container">
+        <div class="register-box">
+            <h1 class="title">Registrar Usuario</h1>
+            <form id="registerForm">
+                <div class="input-group">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" id="fullName" class="input-field" placeholder="Nombre Completo" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="email" class="input-field" placeholder="Correo Electrónico" required>
+                </div>
+
+                <div class="input-group" id="passwordContainer">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" class="input-field" placeholder="Contraseña" required>
+                </div>
+    
+                <div class="input-group">
+                    <label for="photo" class="photo-label">
+                        <i class="fas fa-camera input-icon"></i> Selecciona una Foto de Perfil
+                    </label>
+                    <input type="file" id="photo" accept="image/*" style="display: none;">
+                    <img id="photoPreview" class="photo-preview" style="display: none;" alt="Vista previa">
+                </div>
+
+                <button type="button" class="btn-register" onclick="registerUser()">Registrar</button>
+            </form>
+
+            <p class="login-link">¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a>.</p>
+        </div>
+    </div>
+
+    <script src="/__/firebase/11.0.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-storage-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="js/register.js"></script>
+
+
+    <script>
+        document.getElementById('photo').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const photoPreview = document.getElementById('photoPreview');
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('photoPreview').style.display = "none";
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const socialUser = localStorage.getItem("socialUser");
+            if (socialUser) {
+                const { fullName, email, photoURL } = JSON.parse(socialUser);
+                document.getElementById("fullName").value = fullName || "";
+                document.getElementById("email").value = email || "";
+                document.getElementById("email").readOnly = true; 
+                if (photoURL) {
+                    const photoPreview = document.getElementById("photoPreview");
+                    photoPreview.src = photoURL;
+                    photoPreview.style.display = "block";
+                }
+                document.getElementById("passwordContainer").style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>

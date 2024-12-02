@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="login-container">
+        <div class="login-box">
+            <h1 class="title">Bienvenido</h1>
+            <p class="subtitle">Por favor, inicia sesión para continuar</p>
+            <form id="loginForm" class="login-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="email" class="input-field" placeholder="Correo Electrónico" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="password" class="input-field" placeholder="Contraseña" required>
+                </div>
+                <button type="button" class="btn-login" onclick="loginUser()">Iniciar Sesión</button>
+            </form>
+            <p class="register-link">¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a>.</p>
+            <div class="social-buttons">
+                <div class="social-btn google" onclick="loginWithGoogle()">
+                    <i class="fab fa-google social-icon"></i>
+                    <span>Iniciar con Google</span>
+                </div>
+                <div class="social-btn github" onclick="loginWithGitHub()">
+                    <i class="fab fa-github social-icon"></i>
+                    <span>Iniciar con GitHub</span>
+                </div>
+                <div class="social-btn guest" onclick="loginAsGuest()">
+                    <i class="fas fa-user-alt social-icon"></i>
+                    <span>Entrar como Invitado</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/__/firebase/11.0.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-storage-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

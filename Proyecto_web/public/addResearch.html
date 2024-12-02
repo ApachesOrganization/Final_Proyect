@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Investigación</title>
+    <link rel="stylesheet" href="css/addResearch.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"> <!-- SweetAlert2 -->
+</head>
+<body>
+    <div class="background"></div>
+
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="#">Investigación Académica</a>
+            <ul class="navbar-nav">
+                <li><a id="navInicio" class="nav-link" href="index.html">Inicio</a></li>
+                <li><a id="navAgregar" class="nav-link active" href="addResearch.html">Agregar Investigación</a></li>
+                <li><a id="navLogin" class="nav-link" href="login.html">Iniciar Sesión</a></li>
+                <li><a id="navRegister" class="nav-link" href="register.html">Registrarse</a></li>
+                <li><a id="navLogout" class="nav-link" href="#" onclick="salir()" style="display: none;">Cerrar Sesión</a></li>
+                <li class="nav-item" style="display: none;" id="userInfo">
+                    <div class="user-info">
+                        <img id="userPhoto" src="default_profile.png" alt="Foto de usuario" class="rounded-circle">
+                        <span id="userName" class="user-name">Usuario</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="title">Registrar Investigación</h2>
+
+        <div class="text-center">
+            <div id="imageContainerWrapper" class="image-container-wrapper">
+                <img id="profilePhoto" src="default_profile.png" alt="Tu foto de perfil" class="profile-photo">
+            </div>
+
+        <form id="researchForm" class="form">
+            <div class="form-group">
+                <label for="userNameField">Nombre del usuario</label>
+                <input type="text" id="userNameField" class="form-control" placeholder="Nombre del usuario" readonly>
+            </div>
+            <div class="form-group">
+                <label for="title">Título de la investigación</label>
+                <input type="text" id="title" class="form-control" placeholder="Escribe el título" required>
+            </div>
+            <div class="form-group">
+                <label for="area">Área de interés</label>
+                <input type="text" id="area" class="form-control" placeholder="Escribe el área de interés" required>
+            </div>
+            <div class="form-group">
+                <label for="academicDegree">Grado Académico</label>
+                <input type="text" id="academicDegree" class="form-control" placeholder="Escribe el grado académico" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea id="description" class="form-control" rows="4" placeholder="Describe la investigación" required></textarea>
+                <small id="descriptionCount" class="form-text">0 / 500 caracteres</small>
+            </div>
+            <div class="form-group">
+                <label for="pdfFile">Archivo PDF</label>
+                <input type="file" id="pdfFile" class="form-control" accept="application/pdf" required>
+            </div>
+            <div class="form-group">
+                <label>Imágenes (4 a 6 imágenes)</label>
+                <div id="imageContainer" class="image-container"></div>
+                <button type="button" class="btn btn-primary" onclick="addImage()">Añadir Imagen</button>
+                <small id="imageCount" class="form-text">0 imágenes agregadas</small>
+            </div>
+            <div class="form-group">
+                <label for="conclusions">Conclusiones</label>
+                <textarea id="conclusions" class="form-control" rows="3" placeholder="Escribe las conclusiones" required></textarea>
+                <small id="conclusionsCount" class="form-text">0 / 500 caracteres</small>
+            </div>
+            <div class="form-group">
+                <label for="recommendations">Recomendaciones</label>
+                <textarea id="recommendations" class="form-control" rows="3" placeholder="Escribe las recomendaciones" required></textarea>
+                <small id="recommendationsCount" class="form-text">0 / 500 caracteres</small>
+            </div>
+            <button type="button" class="btn-primary" onclick="addResearch()">Registrar Investigación</button>
+        </form>
+    </div>
+
+    <script src="/__/firebase/11.0.0/firebase-app-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-auth-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/11.0.0/firebase-storage-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
+    <script src="js/authState.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/charCounter.js"></script>
+    <script src="js/addResearch.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setupCharCounter('description', 'descriptionCount', 500);
+            setupCharCounter('conclusions', 'conclusionsCount', 500);
+            setupCharCounter('recommendations', 'recommendationsCount', 500);
+        });
+
+        firebase.auth().onAuthStateChanged(user => {
+            const navLogin = document.getElementById("navLogin");
+            const navRegister = document.getElementById("navRegister");
+            const navLogout = document.getElementById("navLogout");
+            const userInfo = document.getElementById("userInfo");
+            const userNameField = document.getElementById("userNameField");
+
+            if (user) {
+                navLogin.style.display = "none";
+                navRegister.style.display = "none";
+                navLogout.style.display = "block";
+                userInfo.style.display = "flex";
+
+                firebase.firestore().collection("users").doc(user.uid).get()
+                    .then(doc => {
+                        const userData = doc.exists ? doc.data() : null;
+                        const fullName = userData?.fullName || user.displayName || "Usuario";
+
+                        document.getElementById("userName").innerText = fullName;
+                        if (userNameField) userNameField.value = fullName;
+
+                        document.getElementById("userPhoto").src = userData?.photoURL || user.photoURL || "default_profile.png";
+                        document.getElementById("profilePhoto").src = userData?.photoURL || user.photoURL || "default_profile.png";
+                    });
+            } else {
+                navLogin.style.display = "block";
+                navRegister.style.display = "block";
+                navLogout.style.display = "none";
+                userInfo.style.display = "none";
+                if (userNameField) userNameField.value = "";
+            }
+        });
+    </script>
+</body>
+</html>
